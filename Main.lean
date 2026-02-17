@@ -5,8 +5,7 @@ CPSC-326-01
 Dr. Johnson
 -/
 
--- Functions and data types (defs) use camelCase
--- Types and structures use PascalCase
+-- 1. Ternary tree structure for course prerequisites
 
 -- A ternary tree where each node holds a course and up to 3 children
 -- Node takes 4 arguments: String (course name) and 3 empty CourseTree values (l, m, r children)
@@ -77,6 +76,8 @@ def buildCatalog : CourseTree :=
   let tree := insertUnder tree "CPSC 260" "CPSC 348"
   tree
 
+-- 2. Search for a course's chained prerequisites
+
 -- Find the prereq chain for a course
 -- Takes a tree, a target course name, and an accumulator list (path so far), and returns an
 -- Option (List String) - either some list of courses if found, or none if not
@@ -97,3 +98,44 @@ def findPath : CourseTree -> String -> List String -> Option (List String)
 -- Uses findPath in order to create the prereq chain
 def prereqChain (tree : CourseTree) (course: String) : Option (List String) :=
   findPath tree course []
+
+-- 3. Compare two trees and output completion percentage
+
+-- Flattens a tree into a list
+-- At a particular node, take this node's name as a single-element list, then concatenate it
+-- with the results of recursing into all 3 children nodes. Eventually collects every course
+-- in the entire tree.
+def collectCourses : CourseTree -> List String
+  | CourseTree.leaf => []
+  | CourseTree.node name left mid right =>
+    [name] ++ collectCourses left ++ collectCourses mid ++ collectCourses right
+
+-- Check if a string is in a list
+-- Destructure the list into its head (1st element) and tail (the rest). If the head matches
+-- the string, return true, otherwise, recurse on the tail
+def contains : List String -> String -> Bool
+  | [], _ => false
+  | head :: tail, string => if head == string then true else contains tail string
+
+-- Count how many items from one list appear in another
+-- Will take in a list of required courses and a list of completed courses to track progress
+-- Take the first required course (head), if it appears in the done list, count it as 1 and
+-- recurse on the remaining courses. If not, skip it (so add 0) and recurse
+def countMatches : List String -> List String -> Nat
+  | [], _ => 0
+  | head :: tail, done =>
+    if contains done head then 1 + countMatches tail done
+    else countMatches tail done
+
+-- Takes two trees, the full required course catalog and the courses the student has completed
+def completionPercentage (required completed : CourseTree) : Nat :=
+  -- Flatten required tree into a list (["CPSC 121", "CPSC 122", "CPSC 223", ...])
+  let reqList := collectCourses required
+  -- Flatten completed tree into a list (["CPSC 121", "CPSC 122", ...])
+  let doneList := collectCourses completed
+  -- Count how many courses are required total
+  let total := reqList.length
+  -- Count how many required courses appear in the completed list
+  let matched := countMatches reqList doneList
+  -- Compute the percentage of courses completed within the required curriculum
+  (matched * 100) / total

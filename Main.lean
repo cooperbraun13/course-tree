@@ -40,3 +40,39 @@ def insertUnder : CourseTree -> String -> String -> CourseTree
     -- all 3 children to keep searching
     else
       CourseTree.node name (insertUnder left parent child) (insertUnder mid parent child) (insertUnder right parent child)
+
+-- Build the full catalog tree
+-- Root = CPSC 121 (no prereqs)
+-- Children = courses requiring parent
+/-
+CPSC 121
+  CPSC 122
+    CPSC 223
+      CPSC 326
+      CPSC 351
+      CPSC 450
+    CPSC 224
+      CPSC 391
+        CPSC 491
+          CPSC 492
+        CPSC 499
+    CPSC 260
+      CPSC 346
+      CPSC 348
+-/
+def buildCatalog : CourseTree :=
+  let tree := singleNode "CPSC 121"
+  let tree := insertUnder tree "CPSC 121" "CPSC 122"
+  let tree := insertUnder tree "CPSC 122" "CPSC 223"
+  let tree := insertUnder tree "CPSC 122" "CPSC 224"
+  let tree := insertUnder tree "CPSC 122" "CPSC 260"
+  let tree := insertUnder tree "CPSC 223" "CPSC 326"
+  let tree := insertUnder tree "CPSC 223" "CPSC 351"
+  let tree := insertUnder tree "CPSC 223" "CPSC 450"
+  let tree := insertUnder tree "CPSC 224" "CPSC 391"
+  let tree := insertUnder tree "CPSC 391" "CPSC 491"
+  let tree := insertUnder tree "CPSC 391" "CPSC 499"
+  let tree := insertUnder tree "CPSC 491" "CPSC 492"
+  let tree := insertUnder tree "CPSC 260" "CPSC 346"
+  let tree := insertUnder tree "CPSC 260" "CPSC 348"
+  tree

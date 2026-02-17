@@ -156,3 +156,33 @@ def myTree : CourseTree :=
 -- Run comparison
 #eval collectCourses myTree
 #eval completionPercentage buildCatalog myTree
+
+-- Prerequisites for CPSC 492
+#eval prereqChain buildCatalog "CPSC 492"
+
+-- Helper function to create an indentation. Takes a number and a padding string and returns the
+-- repeated padding
+def makeIndent : Nat -> String -> String
+  | 0, _ => ""
+  | n + 1, pad => pad ++ makeIndent n pad
+
+-- Pretty print a tree
+-- Builds a string with indentation (similar to the one above my buildCatalog function) to show
+-- the tree structure
+def prettyPrint : CourseTree -> Nat -> String
+  | CourseTree.leaf, _ => ""
+  | CourseTree.node name left mid right, depth =>
+    let indent := makeIndent depth "    "
+    let line := indent ++ name ++ "\n"
+    let childLeft := prettyPrint left (depth + 1)
+    let childMid := prettyPrint mid (depth + 1)
+    let childRight := prettyPrint right (depth + 1)
+    line ++ childLeft ++ childMid ++ childRight
+
+def displayTree(tree : CourseTree) : String :=
+  prettyPrint tree 0
+
+-- Display both trees
+-- Used IO.println so that the it would properly print
+#eval IO.println (displayTree buildCatalog)
+#eval IO.println (displayTree myTree)

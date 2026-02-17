@@ -76,3 +76,24 @@ def buildCatalog : CourseTree :=
   let tree := insertUnder tree "CPSC 260" "CPSC 346"
   let tree := insertUnder tree "CPSC 260" "CPSC 348"
   tree
+
+-- Find the prereq chain for a course
+-- Takes a tree, a target course name, and an accumulator list (path so far), and returns an
+-- Option (List String) - either some list of courses if found, or none if not
+def findPath : CourseTree -> String -> List String -> Option (List String)
+  | CourseTree.leaf, _, _ => none
+  | CourseTree.node name left mid right, target, acc =>
+    if name == target then
+      some acc
+    else
+      let acc' := acc ++ [name]
+      match findPath left target acc' with
+      | some path => some path
+      | none =>
+        match findPath mid target acc' with
+        | some path => some path
+        | none => findPath right target acc'
+
+-- Uses findPath in order to create the prereq chain
+def prereqChain (tree : CourseTree) (course: String) : Option (List String) :=
+  findPath tree course []

@@ -139,3 +139,20 @@ def completionPercentage (required completed : CourseTree) : Nat :=
   let matched := countMatches reqList doneList
   -- Compute the percentage of courses completed within the required curriculum
   (matched * 100) / total
+
+-- Tree representation of the courses I have completed
+def myTree : CourseTree :=
+  let tree := singleNode "CPSC 121"
+  let tree := insertUnder tree "CPSC 121" "CPSC 122"
+  let tree := insertUnder tree "CPSC 122" "CPSC 223"
+  let tree := insertUnder tree "CPSC 122" "CPSC 224"
+  let tree := insertUnder tree "CPSC 122" "CPSC 260"
+  let tree := insertUnder tree "CPSC 223" "CPSC 326"
+  let tree := insertUnder tree "CPSC 224" "CPSC 391"
+  let tree := insertUnder tree "CPSC 260" "CPSC 346"
+  let tree := insertUnder tree "CPSC 260" "CPSC 348"
+  tree
+
+-- Run comparison
+#eval collectCourses myTree
+#eval completionPercentage buildCatalog myTree
